@@ -36,7 +36,7 @@ async function createRecomendation() {
   return recomendation;
 }
 
- async function createCompleteRecommendation() {
+async function createCompleteRecommendation() {
   const recomendation = await prisma.recommendation.create({
     data: {
       id: parseInt(faker.finance.amount(0, 5, 0)),
@@ -73,7 +73,7 @@ export {
   createOneVideo,
   createRecomendation,
   createRecomendationsWithRandomScores,
-  createCompleteRecommendation
+  createCompleteRecommendation,
 };
 
 afterAll(async () => {

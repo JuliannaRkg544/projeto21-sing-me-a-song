@@ -32,7 +32,7 @@ describe("GET /recommendations/:id", () => {
 });
 
 describe("GET recommendations /recommendations/top/:amount", () => {
-  it("should return the amount of recommendations sort by greater scores ", async () => {
+  it("should return the amount of recommendations sorted by greater scores ", async () => {
     const amount = parseInt(faker.finance.amount(1, 10, 0));
 
     const recomendations =
@@ -55,100 +55,99 @@ describe("GET recommendations /recommendations/top/:amount", () => {
 });
 
 describe("POST recommendation /recommendation ", () => {
-  it("it should return 201 after user post ", async () => {
+  it("should return 201 after user post ", async () => {
     const video = recommendationFactory.createOneVideo();
     const result = await supertest(app).post("/recommendations").send(video);
     expect(result.status).toEqual(201);
   });
 });
 
-describe("POST /recommendations/:id/upvote", ()=>{
-    it('should return 200 when upvoting', async ()=>{     
-        
-        const recommendation = await recommendationFactory.createRecomendation()  
-        const {id,score} = await prisma.recommendation.findFirst({
-            where:{
-                name: recommendation.name
-            }
-        })
-        
-        
-        const response = await supertest(app).post(`/recommendations/${id}/upvote`)
-        expect(response.status).toBe(200)
+describe("POST /recommendations/:id/upvote", () => {
+  it("should return 200 when upvoting", async () => {
+    const recommendation = await recommendationFactory.createRecomendation();
+    const { id, score } = await prisma.recommendation.findFirst({
+      where: {
+        name: recommendation.name,
+      },
+    });
 
-        const verifyScore = await prisma.recommendation.findFirst({
-            where:{
-                name: recommendation.name
-            }
-        })        
-        expect(verifyScore.score).toBeGreaterThan(score)
-    })
-    const number = faker.finance.amount(0,10,0)
-
-    it('should return 404 when upvoting an unexisting recommendation', async ()=>{    
-                        
-        const response = await supertest(app).post(`/recommendations/${number}/upvote`)
-        expect(response.status).toBe(404)
-      
-    })
-})
-
- describe("POST /recommendations/:id/downvote", ()=>{
-     it('should return 200 when downvoting', async ()=>{     
-        
-    const recommendation = await recommendationFactory.createRecomendation()  
-    const {id,score} = await prisma.recommendation.findFirst({
-        where:{
-            name: recommendation.name
-        }
-    })          
-            
-    const response = await supertest(app).post(`/recommendations/${id}/downvote`)
-    expect(response.status).toBe(200)
+    const response = await supertest(app).post(`/recommendations/${id}/upvote`);
+    expect(response.status).toBe(200);
 
     const verifyScore = await prisma.recommendation.findFirst({
-        where:{
-            name: recommendation.name
-        }
-    })        
-    expect(verifyScore.score).not.toBeGreaterThanOrEqual(score)
- })
- it('should return 200 when downvoting an recommendation wich has -5 points score', async ()=>{     
-        
-    const recommendation = await recommendationFactory.createRecomendation()  
+      where: {
+        name: recommendation.name,
+      },
+    });
+    expect(verifyScore.score).toBeGreaterThan(score);
+  });
+  const number = faker.finance.amount(0, 10, 0);
 
-    const {id} = await prisma.recommendation.findFirst({
-        where:{
-            name: recommendation.name
-        }
-    })
-    
+  it("should return 404 when upvoting an unexistent recommendation", async () => {
+    const response = await supertest(app).post(
+      `/recommendations/${number}/upvote`
+    );
+    expect(response.status).toBe(404);
+  });
+});
+
+describe("POST /recommendations/:id/downvote", () => {
+  it("should return 200 when downvoting", async () => {
+    const recommendation = await recommendationFactory.createRecomendation();
+    const { id, score } = await prisma.recommendation.findFirst({
+      where: {
+        name: recommendation.name,
+      },
+    });
+
+    const response = await supertest(app).post(
+      `/recommendations/${id}/downvote`
+    );
+    expect(response.status).toBe(200);
+
+    const verifyScore = await prisma.recommendation.findFirst({
+      where: {
+        name: recommendation.name,
+      },
+    });
+    expect(verifyScore.score).not.toBeGreaterThanOrEqual(score);
+  });
+  it("should return 200 when downvoting an recommendation wich has -5 points score", async () => {
+    const recommendation = await recommendationFactory.createRecomendation();
+
+    const { id } = await prisma.recommendation.findFirst({
+      where: {
+        name: recommendation.name,
+      },
+    });
+
     await prisma.recommendation.update({
-        where:{id},
-        data:{
-            score:-5
-        }
-    })
-            
-    const response = await supertest(app).post(`/recommendations/${id}/downvote`)
-    expect(response.status).toBe(200)
+      where: { id },
+      data: {
+        score: -5,
+      },
+    });
+
+    const response = await supertest(app).post(
+      `/recommendations/${id}/downvote`
+    );
+    expect(response.status).toBe(200);
 
     const verifyRecommendation = await prisma.recommendation.findFirst({
-        where:{
-            id,
-        }
-    })        
-    expect(verifyRecommendation).toBe(null)
-})
-it('should return 404 when downvoting an unexisting recommendation', async ()=>{    
-        
-    const number = faker.finance.amount(0,10,0)
-    const response = await supertest(app).post(`/recommendations/${number}/downvote`)
-    expect(response.status).toBe(404)
-  
-})
-
-})
+      where: {
+        id,
+      },
+    });
+    expect(verifyRecommendation).toBe(null);
+  });
+  it("should return 404 when downvoting an unexistent recommendation", async () => {
+    const number = faker.finance.amount(0, 10, 0);
+    const response = await supertest(app).post(
+      `/recommendations/${number}/downvote`
+    );
+    expect(response.status).toBe(404);
+  });
+});
 
 describe("GET /recommendations/random", () => {
   it("should return a 10 length array when get recommendations ", async () => {
