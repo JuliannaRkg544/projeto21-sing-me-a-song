@@ -4,7 +4,7 @@ import { CreateRecommendationData } from "../services/recommendationsService.js"
 
 async function create(createRecommendationData: CreateRecommendationData) {
   await prisma.recommendation.create({
-    data: createRecommendationData,
+    data: createRecommendationData, 
   });
 }
 
