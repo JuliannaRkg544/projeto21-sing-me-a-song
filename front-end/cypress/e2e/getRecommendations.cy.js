@@ -5,7 +5,7 @@ const URL = "http://localhost:3000/";
 const URLrandom = "http://localhost:3000/random";
 const URLtop = "http://localhost:3000/top";
 
-describe("E2E tests, Route recommendations/",(()=>{
+describe("E2E tests,  recommendations/",(()=>{
   beforeEach(() => {
     cy.request("POST", "http://localhost:4000/delete-all", {});
   })
@@ -21,7 +21,7 @@ describe("E2E tests, Route recommendations/",(()=>{
 })
 }))
 
-describe("should create recommendations and show the top scores recommendation at /top", () => {
+describe("should create recommendations and upvote", () => {
   beforeEach(() => {
     cy.request("POST", "http://localhost:4000/delete-all", {});
   });
@@ -39,12 +39,12 @@ describe("should create recommendations and show the top scores recommendation a
   });
 });
 
-describe("should upvote a recommendation", () => {
+describe("should downvote a recommendation", () => {
   beforeEach(() => {
     cy.request("POST", "http://localhost:4000/delete-all", {});
   });
   const recommendation = videosFactory.createVideo();
-  it("should upvote a recommendation", () => {
+  it("should downvote a recommendation", () => {
     cy.visit(URL);
     cy.get("#name").type(recommendation.name);
     cy.get("#link").type(recommendation.youtubeLink);
@@ -65,7 +65,7 @@ describe("should show a random recommendation ", () => {
     cy.request("POST", "http://localhost:4000/delete-all", {});
   });
 
-  const recommendation = videosFactory.createVideo();
+   videosFactory.createVideo();
   it("ramdom recommendation", () => {
     videosFactory.createTenVideo()
     cy.visit(URLrandom);
