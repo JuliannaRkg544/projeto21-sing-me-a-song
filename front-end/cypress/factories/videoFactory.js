@@ -4,17 +4,21 @@ import axios from "axios";
 function createVideo() {
   const video = {
     name: faker.music.songName(),
-    link: faker.internet.url(),
+    youtubeLink:`www.youtube.com/watch?v=${faker.random.alphaNumeric(10)}`,
   };
   return video;
 }
 
-// async function postVideo() {
-//   const video = createVideo();
-//   axios
-//     .post("http://localhost:4000/recommendations", video)
-//     .then(res => console.log(res.data))
-//     .catch(err=> console.log(err.response));
-// }
 
-export { createVideo };
+
+async function createTenVideo() {
+  for(let i = 0; i<10;i++) {
+    let video = createVideo();
+    // await axios.post('http://localhost:4000/recommendations', video)
+    axios
+    .post("http://localhost:4000/recommendations", video)
+    .then(res => console.log(res.data))
+    .catch(err=> console.log(err.response));
+  }
+}
+export { createVideo, createTenVideo };

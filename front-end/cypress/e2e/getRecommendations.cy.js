@@ -1,43 +1,77 @@
 /// <reference types="cypress" />
 import * as videosFactory from "../factories/videoFactory.js";
-import {faker} from "@faker-js/faker"
 
+const URL = "http://localhost:3000/";
+const URLrandom = "http://localhost:3000/random";
+const URLtop = "http://localhost:3000/top";
 
-describe("E2E TEST - Route recommendations/", () => {
-  it("should post a video",  () => {
-    const video =  videosFactory.createVideo();
-    cy.intercept({
-      method: "GET",
-      url: "/recommendations",
-    }).as("get_videos");
-    cy.visit("http://localhost:3000"); 
-    cy.wait("@get_videos");
-    cy.get("#name").type(video.name);
-    cy.get("#link").type(video.link);
-    cy.intercept({
-      method: "POST",
-      url: "/recommendations",
-    }).as("post_video");
+describe("E2E tests, Route recommendations/",(()=>{
+  beforeEach(() => {
+    cy.request("POST", "http://localhost:4000/delete-all", {});
+  })
+  it("should post a video", () =>{
+    const recommendation = videosFactory.createVideo()
+    cy.visit(URL);
+    cy.get("#name").type(recommendation.name);
+    cy.get("#link").type(recommendation.youtubeLink)
     cy.get("#submmit-button").click();
-    cy.wait("@post_video").then((interception) => {
-      cy.log("LOGO DE INTERCEPTION ", interception);
-      expect(interception.response.statusCode).to.equal(200);
-    });
+
+    cy.url().should("equal", URL)
+
+})
+}))
+
+describe("should create recommendations and show the top scores recommendation at /top", () => {
+  beforeEach(() => {
+    cy.request("POST", "http://localhost:4000/delete-all", {});
   });
-  it("should load videos ", () => {
-    let videoNum = 0;
-    cy.intercept({
-      method: "GET",
-      url: "/recommendations",
-    }).as("get_videos");
-    cy.visit("http://localhost:3000");
-    cy.wait("@get_videos").then((intercept) => {
-      const arr = intercept.response.body;
-      videoNum = arr.length;
-      cy.log("VIDEOS", intercept);
-    });
-    cy.get("article").then((articles) => {
-      expect(articles.length).to.equals(videoNum);
-    });
+  const recommendation =  videosFactory.createVideo()
+
+  it("should upvote a recommendation", () => {
+    cy.visit(URL);
+    cy.get("#name").type(recommendation.name);
+    cy.get("#link").type(recommendation.youtubeLink);
+    cy.get("#submmit-button").click();
+    cy.visit(URL);
+    cy.get("article div svg").eq(0).click();
+    cy.visit(URLtop);
+    cy.get("#row").should("have.text", 1);
+  });
+});
+
+describe("should upvote a recommendation", () => {
+  beforeEach(() => {
+    cy.request("POST", "http://localhost:4000/delete-all", {});
+  });
+  const recommendation = videosFactory.createVideo();
+  it("should upvote a recommendation", () => {
+    cy.visit(URL);
+    cy.get("#name").type(recommendation.name);
+    cy.get("#link").type(recommendation.youtubeLink);
+    cy.get("#submmit-button").click();
+
+    cy.visit(URL);
+    cy.get("article div svg").eq(1).click();
+
+    cy.url().should("equal", URL);
+    cy.get("#row").should("have.text", -1);
+  });
+});
+
+
+
+describe("should show a random recommendation ", () => {
+  beforeEach(() => {
+    cy.request("POST", "http://localhost:4000/delete-all", {});
+  });
+
+  const recommendation = videosFactory.createVideo();
+  it("ramdom recommendation", () => {
+    videosFactory.createTenVideo()
+    cy.visit(URLrandom);
+    const video1 = cy.get("article div").eq(0)
+    cy.visit(URL)
+    cy.visit(URLrandom);
+    cy.get("article div").eq(0).should("be.visible").and("not.equal",video1)
   });
 });
